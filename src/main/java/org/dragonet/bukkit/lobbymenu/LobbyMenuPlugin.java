@@ -70,7 +70,7 @@ public class LobbyMenuPlugin extends JavaPlugin implements Listener {
     }
 
     public void reloadConfigurations() {
-        menu.cleanUp();
+        if(menu != null) menu.cleanUp();
         menu = null;
         menuConfigs = null;
 
