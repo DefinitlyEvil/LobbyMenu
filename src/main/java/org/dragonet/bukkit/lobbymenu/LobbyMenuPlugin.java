@@ -60,16 +60,25 @@ public class LobbyMenuPlugin extends JavaPlugin implements Listener {
         getLogger().info("Loading configurations... ");
         saveResource("config.yml", false);
         saveResource("menus/test.yml", false);
-        config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-        getLogger().info("Loading menues... ");
-        menusDir = new File(getDataFolder(), "menus");
-        menusDir.mkdirs();
-        loadMenus();
         getLogger().info("Registering events... ");
         getServer().getPluginManager().registerEvents(menu, this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new ItemUseListener(this), this);
         getCommand("menu").setExecutor(new MenuCommand(this));
+
+        reloadConfigurations();
+    }
+
+    public void reloadConfigurations() {
+        menu.cleanUp();
+        menu = null;
+        menuConfigs = null;
+
+        config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+        getLogger().info("Loading menues... ");
+        menusDir = new File(getDataFolder(), "menus");
+        menusDir.mkdirs();
+        loadMenus();
 
         Bukkit.getServer().getOnlinePlayers().forEach(this::applyHotbar);
     }
