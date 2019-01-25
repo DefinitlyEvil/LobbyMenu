@@ -1,0 +1,7 @@
+main: org.dragonet.bukkit.lobbymenu.LobbyMenuPlugin
+version: 1.1
+name: LobbyMenu
+author: DefinitlyEvil
+commands:
+  menu:
+    description: "Restore menu items to the hotbar. "

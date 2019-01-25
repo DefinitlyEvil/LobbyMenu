@@ -1,0 +1,5 @@
+MENU_NOT_FOUND: "\u00a7cFailed to find menu [%s]! "
+CONNECTING: "\u00a77connecting to [%s]... "
+ACTION_NOT_DEFINED: "\u00a7cButton function not defined correctly! "
+HOTBAR_RESTORED: "\u00a7aHotbar menus are restored! "
+MESSAGE_NOT_DEFINED: "\u00a7cMessage to be sent not defined! "

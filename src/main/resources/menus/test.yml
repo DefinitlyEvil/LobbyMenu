@@ -1,0 +1,27 @@
+title: "Test Menu"
+size: 18
+buttons:
+  0: 
+    material: DIAMOND_PICKAXE
+    name: "Button to run command"
+    lore:
+      - "Blah"
+    # choose from: command/server/menu
+    type: command
+    value: "suicide"
+  1: 
+    material: DIAMOND_PICKAXE
+    name: "Button to switch server"
+    lore:
+      - "Requires BungeeCord"
+    # choose from: command/server/menu
+    type: server
+    value: "lobby"
+  2:  
+    material: DIAMOND_PICKAXE
+    name: "Button to open another menu"
+    lore:
+      - "Just an example"
+    # choose from: command/server/menu
+    type: menu
+    value: "not-defined-menu"
