@@ -3,6 +3,7 @@ package org.dragonet.bukkit.lobbymenu;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -37,6 +38,7 @@ public class ItemMenu implements Listener{
             entry.getValue().getInventory().getViewers().forEach(p -> p.closeInventory());
         });
         instances.clear();
+        HandlerList.unregisterAll(this);
     }
 
     @EventHandler

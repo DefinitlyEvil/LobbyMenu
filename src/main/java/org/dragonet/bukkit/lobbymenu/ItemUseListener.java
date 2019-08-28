@@ -81,7 +81,7 @@ public class ItemUseListener implements Listener {
                 handler = ((human, menu) -> human.sendMessage(Lang.ACTION_NOT_DEFINED.build()));
             }
             i.setButton(slot,
-                    Material.valueOf(b.getString("material")),
+                    Material.matchMaterial(b.getString("material")),
                     b.getString("name").replace("&", "\u00a7"),
                     b.getStringList("lore").stream().map((l) -> l.replace("&", "\u00a7")).collect(Collectors.toList()),
                     handler);
@@ -89,7 +89,7 @@ public class ItemUseListener implements Listener {
         plugin.getMenu().open(player, i);
     }
 
-    private static String searchItemName(ItemStack item) {
+    public static String searchItemName(ItemStack item) {
         if(item == null) return null;
         ItemMeta meta = item.getItemMeta();
         if(!meta.hasLore()) return null;

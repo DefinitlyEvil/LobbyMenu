@@ -2,10 +2,14 @@ package org.dragonet.bukkit.lobbymenu;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -14,6 +18,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -73,6 +78,10 @@ public class LobbyMenuPlugin extends JavaPlugin implements Listener {
         if(menu != null) menu.cleanUp();
         menu = null;
         menuConfigs = null;
+
+        menu = new ItemMenu(this);
+        getServer().getPluginManager().registerEvents(menu, this);
+        menuConfigs = new HashMap<>();
 
         config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
         getLogger().info("Loading menues... ");
@@ -141,18 +150,14 @@ public class LobbyMenuPlugin extends JavaPlugin implements Listener {
         getServer().getScheduler().runTaskLater(this, () -> applyHotbar(e.getPlayer()) , 20L);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerDeath(PlayerDeathEvent e) {
         if(e.getKeepInventory()) return;
-        e.setKeepInventory(true);
-        for(int i = 0; i < e.getEntity().getInventory().getSize(); i++) {
-            // check for buttons
-            if (!isButton(i)) {
-                if(e.getEntity().getInventory().getItem(i) == null || e.getEntity().getInventory().getItem(i).getType().equals(Material.AIR)) continue;
-                e.getEntity().getWorld().dropItem(e.getEntity().getLocation(), e.getEntity().getInventory().getItem(i));
-            }
+        Iterator<ItemStack> iterator = e.getDrops().iterator();
+        while(iterator.hasNext()) {
+            ItemStack i = iterator.next();
+            if(ItemUseListener.searchItemName(i) != null) iterator.remove();
         }
-        e.getEntity().getInventory().clear();
     }
 
     @EventHandler
@@ -174,10 +179,31 @@ public class LobbyMenuPlugin extends JavaPlugin implements Listener {
         for(String strSlotIndex : hotbar.getKeys(false)) {
             int slot = Integer.parseInt(strSlotIndex);
             ItemStack item = new ItemStack(
-                    Material.valueOf(hotbar.getString(strSlotIndex + ".material")),
+                    Material.matchMaterial(hotbar.getString(strSlotIndex + ".material")),
                     config.getInt(strSlotIndex + ".amount", 1)
             );
             ItemMeta meta = item.getItemMeta();
+            if(hotbar.contains(strSlotIndex + ".enchantments") && hotbar.isList(strSlotIndex + ".enchantments")) {
+                for(String strEnchantAndLevel : hotbar.getStringList(strSlotIndex + ".enchantments")) {
+                    String[] split = strEnchantAndLevel.split(":");
+                    NamespacedKey key = NamespacedKey.minecraft(split[0].toLowerCase());
+                    Enchantment enchantment = Enchantment.getByKey(key);
+                    if(enchantment == null) {
+                        getLogger().warning("Failed getting enchantment with key: " + key.toString());
+                        continue;
+                    }
+                    meta.addEnchant(enchantment,
+                            Integer.parseInt(split[1]),
+                            true);
+                }
+            }
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+
+            if(hotbar.getBoolean(strSlotIndex + ".hide-enchantments", false)) {
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+
             List<String> lore = hotbar.getStringList(strSlotIndex + ".lore").stream().map(l -> l.replace("&", "\u00a7")).collect(Collectors.toList());
             lore.add(PREFIX_MENU + hotbar.getString(strSlotIndex + ".menu"));
             meta.setDisplayName(hotbar.getString(strSlotIndex + ".name").replace("&", "\u00a7"));

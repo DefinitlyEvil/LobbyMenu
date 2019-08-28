@@ -1,8 +1,19 @@
 hotbar:
-  0:
+  7:
+    material: BOOK
+    amount: 1
+    enchantments: false
+    menu: "cmd:help"
+    name: "&eHelp"
+    lore:
+      - "Welcome! "
+  8:
     material: DIAMOND
     amount: 1
+    enchantments:
+      - "unbreaking:2"
+    hide-enchantments: true
     menu: test
-    name: "&eTest Menu"
+    name: "&eMenu"
     lore:
       - "Welcome! "
